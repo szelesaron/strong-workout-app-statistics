@@ -64,4 +64,4 @@ def get_1RM(weight, reps):
 
 
 if __name__ == "__main__":
-    plot_exercise("./data/strong.csv",'Bench Press (Barbell)', True, 5)
+    plot_exercise("./data/strong.csv",'Squat (Barbell)', True, 5)
