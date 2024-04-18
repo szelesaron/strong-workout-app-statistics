@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-v0_8-darkgrid')
 
@@ -10,6 +9,14 @@ def read_data(path: str = "./data/strong.csv"):
 
 
 def plot_exercise(path : str, exercise_name : str, moving_average : bool, window_size : int):
+    """
+    Plot the 1RM of an exercise over time
+
+    path : str : path to the csv file
+    exercise_name : str : name of the exercise
+    moving_average : bool : whether to use moving average
+    window_size : int : size of the moving average window
+    """
     
     data = read_data(path)
 
