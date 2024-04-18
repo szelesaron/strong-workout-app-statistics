@@ -9,7 +9,7 @@ def read_data(path: str = "./data/strong.csv"):
     return data
 
 
-def plot_exercise(path : str, exercise_name : str):
+def plot_exercise(path : str, exercise_name : str, moving_average : bool, window_size : int):
     
     data = read_data(path)
 
@@ -26,6 +26,9 @@ def plot_exercise(path : str, exercise_name : str):
     
     # only get the max 1RM for each date
     exercise = exercise.groupby('Date')['1RM'].max().reset_index()
+
+    if moving_average:
+        exercise['1RM'] = exercise['1RM'].rolling(window=window_size).mean()
 
     # set data as day only
     exercise['Date'] = exercise['Date'].apply(lambda x: x.split(' ')[0])
@@ -50,8 +53,8 @@ def plot_exercise(path : str, exercise_name : str):
     return 1
 
 def get_1RM(weight, reps):
-    return weight * reps * 0.0333 + weight
+    return weight * (1 + (reps/30))
 
 
 if __name__ == "__main__":
-    plot_exercise("./data/strong.csv",'Bench Press (Barbell)')
+    plot_exercise("./data/strong.csv",'Bench Press (Barbell)', True, 5)
