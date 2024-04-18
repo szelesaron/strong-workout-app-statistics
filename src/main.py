@@ -1,31 +1,57 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-v0_8-darkgrid')
 
-# Load the data
-data = pd.read_csv('./data/strong.csv')
-# print(data.head())
 
-print(f"List of exercises: {data['Exercise Name'].unique()}")
+def read_data(path: str = "./data/strong.csv"):
+    data = pd.read_csv(path)
+    return data
 
-# filter for exercise
-exercise = data[data['Exercise Name'] == 'Leg Press']
-print(len(exercise))
-# print(exercise.head())
 
-def get_1rm(weight, reps):
+def plot_exercise(path : str, exercise_name : str):
+    
+    data = read_data(path)
+
+    #filter for exercise
+    avaliable_exercises = data['Exercise Name'].unique()
+    if exercise_name not in avaliable_exercises:
+        print(f"Exercise {exercise_name} not found. Avaliable exercises are {avaliable_exercises}")
+        return 0
+    exercise = data[data['Exercise Name'] == exercise_name]
+    if len(exercise) < 5:
+        print(f"Not enough data found for {exercise_name}, you need at least 5 data point, found {len(exercise)}")
+        return 0
+    exercise['1RM'] = get_1RM(exercise['Weight'], exercise['Reps'])
+    
+    # only get the max 1RM for each date
+    exercise = exercise.groupby('Date')['1RM'].max().reset_index()
+
+    # set data as day only
+    exercise['Date'] = exercise['Date'].apply(lambda x: x.split(' ')[0])
+    
+    # Plot data
+    plt.figure(figsize=(10, 6))
+    plt.plot(exercise['Date'], exercise['1RM'], marker='o', color='skyblue', linewidth=2, markersize=8, label='1RM')
+
+    # Add grid, labels, and title
+    plt.grid(True, alpha=0.5)
+    plt.xlabel('Date', fontsize=12)
+    plt.xticks(rotation=45)
+    plt.ylabel('1RM (kg)', fontsize=12)
+    plt.title(exercise_name, fontsize=14)
+
+    # Add legend
+    plt.legend(loc='best', fontsize=12)
+
+    # Show plot
+    plt.tight_layout()
+    plt.show()
+    return 1
+
+def get_1RM(weight, reps):
     return weight * reps * 0.0333 + weight
 
-# Calculate 1RM
-exercise['1RM'] = get_1rm(exercise['Weight'], exercise['Reps'])
-# print(exercise[:10])
 
-# Only keep the highest 1RM per day
-exercise = exercise.groupby('Date')['1RM'].max().reset_index()
-print(exercise)
-
-
-# Plot the data
-plt.plot(exercise['Date'], exercise['1RM'])
-plt.xlabel('Date', rotation=45)
-plt.show()
+if __name__ == "__main__":
+    plot_exercise("./data/strong.csv",'Bench Press (Barbell)')
